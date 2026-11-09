@@ -2,6 +2,9 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+backend_env = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
+if os.path.exists(backend_env):
+    load_dotenv(backend_env)
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./recruit.db")
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-change-me")
