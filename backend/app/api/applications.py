@@ -44,7 +44,10 @@ def score_requisition(
         criteria.append({"name": f"CTC around {req.ctc_lakhs} lakhs", "weight": 0.8, "required": False})
 
     svc = scoring.ScoringService()
-    candidates = crud.list_candidates(db, current_user)
+    # Score candidates linked to this requisition, or fallback to all available candidates
+    candidates = crud.list_candidates(db, current_user, requisition_id=requisition_id)
+    if not candidates:
+        candidates = crud.list_candidates(db, current_user)
     results = []
     for cand in candidates:
         cv_text = ""
@@ -97,6 +100,8 @@ def ranked_list(
 
     svc = scoring.ScoringService()
     candidates = crud.list_candidates(db, current_user, requisition_id=requisition_id)
+    if not candidates:
+        candidates = crud.list_candidates(db, current_user)
     results = []
     for cand in candidates:
         cv_text = ""

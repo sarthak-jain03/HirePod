@@ -67,6 +67,14 @@ def bulk_upload(
 
         candidate = crud.create_candidate(db, profile, source_file=upload.filename)
         crud.set_consent(db, candidate.id, True, granted_by=current_user.email)
+        # Auto-link candidate to this requisition as "sourced"
+        existing_app = (db.query(models.Application)
+                        .filter(models.Application.requisition_id == requisition_id,
+                                models.Application.candidate_id == candidate.id)
+                        .first())
+        if not existing_app:
+            crud.create_application(db, requisition_id=requisition_id,
+                                    candidate_id=candidate.id, status="sourced")
         results.append({
             "file": upload.filename,
             "candidate_id": candidate.candidate_id,
@@ -189,6 +197,14 @@ def load_demo_batch(
         }
         cand = crud.create_candidate(db, profile, source_file=filename)
         crud.set_consent(db, cand.id, True, granted_by=current_user.email)
+        # Auto-link candidate to this requisition as "sourced"
+        existing_app = (db.query(models.Application)
+                        .filter(models.Application.requisition_id == req.id,
+                                models.Application.candidate_id == cand.id)
+                        .first())
+        if not existing_app:
+            crud.create_application(db, requisition_id=req.id,
+                                    candidate_id=cand.id, status="sourced")
         results.append({
             "file": filename,
             "candidate_id": cand.candidate_id,
